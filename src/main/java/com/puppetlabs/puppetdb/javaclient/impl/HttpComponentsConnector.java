@@ -131,19 +131,14 @@ public class HttpComponentsConnector implements HttpConnector {
 		}
 	}
 
-	protected void assignContent(HttpEntityEnclosingRequestBase request, Map<String, String> params) {
+	protected void assignContent(HttpEntityEnclosingRequestBase request, Map<String, String> params) throws UnsupportedEncodingException {
 		if(params != null && !params.isEmpty()) {
 			List<NameValuePair> pairs = new ArrayList<NameValuePair>(params.size());
 			for(Map.Entry<String, String> param : params.entrySet())
 				pairs.add(new BasicNameValuePair(param.getKey(), param.getValue()));
-			try {
-				StringEntity entity = new StringEntity(URLEncodedUtils.format(pairs, UTF_8.name()), UTF_8.name());
-				entity.setContentType(CONTENT_TYPE_WWW_FORM_URLENCODED);
-				request.setEntity(entity);
-			}
-			catch(UnsupportedEncodingException e) {
-				throw new IllegalArgumentException(e);
-			}
+			StringEntity entity = new StringEntity(URLEncodedUtils.format(pairs, UTF_8.name()), UTF_8.name());
+			entity.setContentType(CONTENT_TYPE_WWW_FORM_URLENCODED);
+			request.setEntity(entity);
 		}
 	}
 
