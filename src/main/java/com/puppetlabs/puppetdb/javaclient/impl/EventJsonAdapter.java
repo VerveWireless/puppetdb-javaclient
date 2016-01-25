@@ -10,12 +10,20 @@ import java.util.List;
 
 /**
  * Created by Nik Ogura on 2014-10-24.
+ * Modified by Jonathon Michael Golden 2016-01-16
  */
 public class EventJsonAdapter implements JsonDeserializer<Event> {
 	@Override
 	public Event deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
+			 {
+		
+		if(json == null){
+			return new Event();
+		}
 		final JsonObject in = json.getAsJsonObject();
+		if(in == null){
+			return new Event();
+		}
 		GsonProvider.DateJsonAdapter dateAdapter = new GsonProvider.DateJsonAdapter();
 		List<String> pathList = new ArrayList<String>();
 
@@ -40,14 +48,18 @@ public class EventJsonAdapter implements JsonDeserializer<Event> {
 			event.setReportReceiveTime(dateAdapter.deserialize(in.get("report-receive-time"), Date.class, context));
 			// //int Fields
 			event.setLine(in.get("line").getAsInt());
-		} catch (UnsupportedOperationException e1) {
+		} catch (UnsupportedOperationException e) {
 			//Disregard, will get a JSON Null exception for empty fields
 		}
 
 		// containment-path
-		for (JsonElement item : in.get("containment-path").getAsJsonArray()) {
-			if (!item.isJsonNull())
-				pathList.add(item.getAsString());
+		try {
+			for (JsonElement item : in.get("containment-path").getAsJsonArray()) {
+				if (!item.isJsonNull())
+					pathList.add(item.getAsString());
+			}
+		} catch (Exception e) {
+
 		}
 		event.setContainmentPath(pathList);
 

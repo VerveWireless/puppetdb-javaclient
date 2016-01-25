@@ -50,10 +50,12 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.puppetlabs.puppetdb.javaclient.APIException;
 import com.puppetlabs.puppetdb.javaclient.APIPreferences;
 import com.puppetlabs.puppetdb.javaclient.HttpConnector;
+import com.puppetlabs.puppetdb.javaclient.model.Event;
 import com.puppetlabs.puppetdb.javaclient.query.Paging;
 
 /**
@@ -81,7 +83,12 @@ public class HttpComponentsConnector implements HttpConnector {
 			return gson.fromJson(bld.toString(), type);
 		}
 		catch(JsonSyntaxException jpe) {
-			throw new APIException("Parse exception converting JSON to object", jpe); //$NON-NLS-1$
+			if(type.getClass().getName().equals("com.puppetlabs.puppetdb.javaclient.model.Event")){
+				return (T) new Event();
+			}
+			else{
+				throw new APIException("Parse exception converting JSON to object", jpe); //$NON-NLS-1$
+			}
 		}
 		finally {
 			try {
